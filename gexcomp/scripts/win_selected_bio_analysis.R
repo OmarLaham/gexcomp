@@ -6,9 +6,9 @@ library('DESeq2');
 #register(MulticoreParam(4))
 
 #install missing libraries
-chooseCRANmirror(ind=33); #Germany
+#chooseCRANmirror(ind=33); #Germany
 
-BiocManager::install("apeglm")
+#BiocManager::install("apeglm")
 
 #commandArgs picks up the variables you pass from the command line
 args <- commandArgs(trailingOnly = TRUE);
