@@ -107,6 +107,7 @@ def util_run_enrichr_analysis(gene_list, enrichr_analysis_input_type):
                      gene_sets=['GO_Biological_Process_2018', 'KEGG_2016'],
                      organism='human',  # don't forget to set organism to the one you desired! e.g. Yeast
                      outdir=None,  # don't write to disk
+                     cutoff=0.05
                      )
 
     df_res = enr.results
@@ -216,7 +217,6 @@ def json_win_selected_bio_analysis(request, run_id, win_start, win_end):
 
     df = pd.read_csv(path.join(settings.RUNS_DIR, run_id, "data.csv"), index_col=0)
     genes = list(df.columns)[win_start:win_end + 1]
-
 
     #select window
     df_win = df.iloc[:, win_start:win_end + 1]
@@ -330,7 +330,7 @@ def json_win_len_bio_analysis(request, run_id, n_wins, win_len, win_step):
         exp_orig = df.iloc[0, win_start:win_end].values
         exp_pred = df.iloc[1, win_start:win_end].values
 
-        exp_err = np.sum(np.abs(exp_orig - exp_pred))
+        exp_err = np.mean(np.abs(exp_orig - exp_pred))
         win_pred_err[win_start] = int(exp_err)
 
     #let's do this only once

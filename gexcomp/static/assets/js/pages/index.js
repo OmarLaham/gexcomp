@@ -227,14 +227,6 @@ function createEnrichmentBarChart(containerID, data) {
             labels: {
                 step: 1
             }
-        }, { // mirror axis on right side
-            opposite: true,
-            reversed: false,
-            categories: categories,
-            linkedTo: 0,
-            labels: {
-                step: 1
-            }
         }],
         yAxis: {
             title: {
@@ -263,7 +255,16 @@ function createEnrichmentBarChart(containerID, data) {
         series: [
             {
                 name: data["database"],
-                data: data["pvals"]
+                data: data["pvals"],
+                cursor: 'pointer',
+                point: {
+                    events: {
+                        click: function () {
+                            //TODO: add functionality to run whole profile enrichment analysis for selected term
+                            alert('Category: ' + this.category.substring(this.category.indexOf('(') + 1, this.category.indexOf(')')));
+                        }
+                    }
+                }
             }
         ]
     });
