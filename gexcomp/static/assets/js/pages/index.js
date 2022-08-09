@@ -277,14 +277,14 @@ function createEnrichmentBarChart(containerID, data, regulation) {//regulation c
 
 }
 
-function createColChart(containerID, data) {//regulation can be up or down
+function createColChart(containerID, data, yLabelsEnabled = false) {//regulation can be up or down
 
     Highcharts.chart(containerID, {
         chart: {
             type: 'column'
         },
         title: {
-            text: ''
+            text: 'Count of Chr-DEGs in the Selected Window'
         },
         subtitle: {
             text: ''
@@ -294,7 +294,10 @@ function createColChart(containerID, data) {//regulation can be up or down
         },
         yAxis: {
             title: {
-                text: 'Count of Chr-DEGs in selected window'
+                text: ''
+            },
+            labels: {
+                enabled: yLabelsEnabled
             }
 
         },
