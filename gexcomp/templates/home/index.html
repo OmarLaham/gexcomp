@@ -60,7 +60,7 @@
             </div>
         </div>
         <!--bio-analysis: will be hidden after first selection of navigation-->
-        <div id="sec-run-win-bio-analysis" class="col-12 col-sm-12 col-xl-12 mb-4 d-none">
+        <div id="sec-run-win-bio-analysis" class="col-12 col-sm-12 col-xl-12 mb-4">
             <div class="card border-0 shadow">
                 <div class="card-body">
                     <div class="row d-block d-xl-flex align-items-center">
@@ -71,6 +71,8 @@
                                 <br /><br />
                                 <button id="btn-win-selected-bio-analysis" class="btn btn-secondary">For Selected Window Above</button>&nbsp;
                                 <button id="btn-win-len-bio-analysis" class="btn btn-info">For Selected Window Length (N=10)</button>
+                                {% comment %}
+                                <!-- will be added to version 2.0 -->
                                 <br /><br />
                                 <div class="ddl-pred-err-wrapper">
                                     <span class="fw-bold">For Pred. Err. Range</span>
@@ -88,36 +90,15 @@
                                         <option value="10">[90-100%] - [.. - ...]</option>
                                     </select>
                                 </div>
+                                {% endcomment %}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!--heatmap-->
-        <div id="win-heatmap" class="col-12 col-sm-12 col-xl-12 mb-4 d-none">
-            <div class="card border-0 shadow">
-                <div class="card-body">
-                    <div class="row d-block d-xl-flex align-items-center">
-                        <div class="col-12 col-xl-12 px-xl-0 text-center">
-                            <div class="d-none d-sm-block">
-                                <h2 class="h6 text-gray-400 mb-0">Gene Expression Error Heatmap</h2>
-                            </div>
-                            <figure class="highcharts-figure">
-                                <div id="gex-err-heatmap"></div>
-                            </figure>
-                            <div class="mt-1">
-                                <span>Pred. Err. Mean: <span id="pred-err-mean" class="text-success fw-bolder"></span></span> -
-                                <span>Pred. Err. Sum: <span id="pred-err-sum" class="text-success fw-bolder">..</span></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-12 col-xl-8">
+        <!-- top wins info -->
+        <div class="col-12 col-xl-12">
             <div id="top-wins-info" class="d-none">
                 <div class="row">
                     <div class="col-12 mb-4">
@@ -125,7 +106,7 @@
                             <div class="card-header">
                                 <div class="row align-items-center">
                                     <div class="col">
-                                        <h2 class="fs-5 fw-bold mb-0">Analyzed windows of selected length</h2>
+                                        <h2 class="fs-5 fw-bold mb-0">Worst predicted windows of selected length</h2>
                                     </div>
                                     <div class="col text-end">
                                         <a href="#" class="btn btn-sm btn-primary">See all</a>
@@ -161,86 +142,69 @@
                         </div>
                     </div>
                 </div>
-                <!-- Whole Profile information -->
-                <div class="row">
-                    <div class="col-12 col-xl-12">
-                        <!-- TOP (M) DEGs in Top (N) Wins -->
-                        <div class="card border-0 shadow">
-                            <div class="card-header">
-                                <div class="row align-items-center">
-                                    <div class="col">
-                                        <h2 class="fs-5 fw-bold mb-0">TOP (M) DEGs in Top (N) Wins</h2>
-                                    </div>
-                                </div>
+            </div>
+        </div>
+        <!--heatmap-->
+        <div id="win-heatmap" class="col-12 col-sm-12 col-xl-12 mb-4 d-none">
+            <div class="card border-0 shadow">
+                <div class="card-body">
+                    <div class="row d-block d-xl-flex align-items-center">
+                        <div class="col-12 col-xl-12 px-xl-0 text-center">
+                            <div class="d-none d-sm-block">
+                                <h2 class="h6 text-gray-400 mb-0">Gene Expression Error Heatmap</h2>
                             </div>
-                            <div>
-                                <div class="table-responsive">
-                                    <table id="whole-profile-degs" class="table align-items-center table-flush">
-                                        <thead class="thead-light">
-                                        <tr>
-                                            <th class="border-bottom" scope="col">Nr.</th>
-                                            <th class="border-bottom" scope="col">Ensl. Gene ID</th>
-                                            <th class="border-bottom" scope="col">P-val</th>
-                                            <th class="border-bottom" scope="col">Adj. P-val</th>
-                                            <th class="border-bottom" scope="col">Log2FC</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td class="text-gray-900" scope="row">
-                                                    ENSG00000028137
-                                                </td>
-                                                <td class="fw-bolder text-gray-500">
-                                                    TNFRSF1B
-                                                </td>
-                                                <td class="fw-bolder text-gray-500">
-                                                    + 0.15123
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="text-gray-900" scope="row">
-                                                    ENSG000000271742
-                                                </td>
-                                                <td class="fw-bolder text-gray-500">
-                                                    (BPTF) Pseudogene
-                                                </td>
-                                                <td class="fw-bolder text-gray-500">
-                                                    - 2.01115
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="text-gray-900" scope="row">
-                                                    ENST00000468444
-                                                </td>
-                                                <td class="fw-bolder text-gray-500">
-                                                    AL049830
-                                                </td>
-                                                <td class="fw-bolder text-gray-500">
-                                                    + 1.12330
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="text-gray-900" scope="row">
-                                                    ENST00000.....
-                                                </td>
-                                                <td class="fw-bolder text-gray-500">
-                                                    ......
-                                                </td>
-                                                <td class="fw-bolder text-gray-500">
-                                                    .......
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                            <figure class="highcharts-figure">
+                                <div id="gex-err-heatmap"></div>
+                            </figure>
+                            <div class="mt-1">
+                                <span>Pred. Err. Mean: <span id="pred-err-mean" class="text-success fw-bolder"></span></span> -
+                                <span>Pred. Err. Sum: <span id="pred-err-sum" class="text-success fw-bolder">..</span></span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-12 col-xl-4">
-            <div id="win-info" class="col-12 px-0 mb-4 d-none">
+    </div>
+
+    <!-- selected win info -->
+    <div id="win-info" class="row d-none">
+        <!-- Top DEGs from selected win -->
+        <div class="col-8 col-xl-8">
+            <div class="row">
+                <div class="col-12 col-xl-12">
+                    <div class="card border-0 shadow">
+                        <div class="card-header">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h2 class="fs-5 fw-bold mb-0">TOP 30 DEGs in Selected Win</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="table-responsive">
+                                <table id="tbl-top-win-degs" class="table align-items-center table-flush">
+                                    <thead class="thead-light">
+                                    <tr>
+                                        <th class="border-bottom" scope="col">Nr.</th>
+                                        <th class="border-bottom" scope="col">Ensl. Gene ID</th>
+                                        <th class="border-bottom" scope="col">P-val</th>
+                                        <th class="border-bottom" scope="col">Adj. P-val</th>
+                                        <th class="border-bottom" scope="col">Log2FC</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- GO, KEGG, Included Genes table -->
+        <div class="col-4 col-xl-4">
+            <div class="col-12 px-0 mb-4">
                 <div class="card border-0 shadow">
                     <!-- Top GO Terms -->
                     <div class="card-header d-flex flex-row align-items-center flex-0 border-bottom">
@@ -280,27 +244,28 @@
                         </figure>
                         -->
                     </div>
-                    <!-- Included genes -->
-                    <div class="card-header d-flex flex-row align-items-center flex-0 border-bottom">
-                        <div class="d-block">
-                            <div class="h5 fw-normal text-gray mb-2">Included Genes</div>
-                        </div>
-                    </div>
-                    <div class="card-body p-2">
-                        <div class="table-responsive">
-                            <table id="tbl-win-included-genes" class="table align-items-center table-flush">
-                                <thead class="thead-light">
-                                <tr>
-                                    <th class="border-bottom" scope="col">Gene</th>
-                                    <th class="border-bottom" scope="col">Gene Symbol</th>
-                                    <th class="border-bottom" scope="col">STD</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+
+                </div>
+            </div>
+            <!-- Included genes -->
+            <div class="card-header d-flex flex-row align-items-center flex-0 border-bottom">
+                <div class="d-block">
+                    <div class="h5 fw-normal text-gray mb-2">Included Genes in Selected Win</div>
+                </div>
+            </div>
+            <div class="card-body p-2">
+                <div class="table-responsive">
+                    <table id="tbl-win-included-genes" class="table align-items-center table-flush">
+                        <thead class="thead-light">
+                        <tr>
+                            <th class="border-bottom" scope="col">Gene</th>
+                            <th class="border-bottom" scope="col">Gene Symbol</th>
+                            <th class="border-bottom" scope="col">STD</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

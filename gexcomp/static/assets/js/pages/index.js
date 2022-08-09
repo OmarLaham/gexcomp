@@ -19,7 +19,6 @@ function createMainChart(data) {
                     mainChartWinEnd = Math.round(event.max);
 
                     $('#win-len').text(mainChartWinEnd - mainChartWinStart + 1);
-                    $('#sec-run-win-bio-analysis').removeClass('d-none');
                     //console.log(mainChartWinStart + " - " + mainChartWinEnd);
                     //event.preventDefault();
                 }
@@ -208,8 +207,9 @@ function createWordCloud(containerID, data) {
 
 function createEnrichmentBarChart(containerID, data) {
 
+    let TEST_MODE = true;
     //categories
-    var categories = data["terms"];
+    var categories = (TEST_MODE) ? ["(term1)", "(t2)", "(t3)", "(t4)"] : data["terms"];
 
     Highcharts.chart(containerID, {
         chart: {
@@ -254,8 +254,8 @@ function createEnrichmentBarChart(containerID, data) {
 
         series: [
             {
-                name: data["database"],
-                data: data["pvals"],
+                name: (TEST_MODE) ? 'Signficanlty regulated' : data["database"],
+                data: (TEST_MODE) ? [1,1.5,1.2,1.4] : ["pvals"],
                 cursor: 'pointer',
                 point: {
                     events: {
@@ -325,6 +325,8 @@ function startWinSelectedBioAnalysis() {
                 //show win heatmap div
                 $('#win-heatmap').removeClass('d-none');
 
+                //scroll to heatmap
+                $('html, body').animate({ scrollTop:$('#win-heatmap').position().top }, 'slow', function () {});
             }
         })
         .fail(function() {
@@ -355,6 +357,9 @@ function startWinSelectedBioAnalysis() {
 
               let dataTblIncludedGenes = data['tbl-included-genes'];
               $("#tbl-win-included-genes > tbody").html(dataTblIncludedGenes);
+
+              let dataTblTopDEGs = data['tbl-top-degs'];
+              $('#tbl-top-win-degs > tbody').html(dataTblTopDEGs);
 
               //show win-info sidebar
               $('#win-info').removeClass('d-none');

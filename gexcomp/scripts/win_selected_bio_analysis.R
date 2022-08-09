@@ -24,13 +24,9 @@ dsPath <- file.path("../media/runs", runID, "data.csv");
 normCountsPath <- file.path("gexcomp", "media", "runs", runID, paste0("data_norm_counts_win_", winStart, "_to_", winEnd, ".csv"))
 cts <- as.matrix(read.csv(normCountsPath, header = T, sep = ",", row.names='gene'))
 
-print(head(cts, 10))
-
 # raead experiment annotation
 annoPath <- file.path("gexcomp", "media", "runs", runID, paste0("data_deg_annotation.csv"))
 coldata <- as.matrix(read.csv(annoPath, header=T, sep=',', row.names=1))
-
-print(head(coldata, 10))
 
 #assert
 rownames(coldata) <- sub("fb", "", rownames(coldata))
@@ -50,12 +46,25 @@ res <- results(dds)
 
 # Note: you should use shrinkage if you want to visualize..
 
+##remove rows with NA padj or log2FoldChange
+res <- res[!is.na(res$padj),]
+res <- res[!is.na(res$log2FoldChange),]
+#res <- res[complete.cases(res[,c("padj", "log2FoldChange")]),]
+
 # order by padj
-resOrdered <- res[order(res$padj),]
+res <- res[order(res$padj),]
+
+#filter results to significant genes
+
+res <- res[res$padj <= 0.05,]
+res <- res[abs(res$log2FoldChange) >= 1.5,]
+#
+res$regulation <- "up"
+res$regulation[res$log2FoldChange < 0] <- "down"
 
 # export results to continue with Python
 savingPath <- file.path("gexcomp", "media", "runs", runID, paste0("deg_group_original_vs_prediction_win_", winStart, "_to_", winEnd, ".csv"))
-write.csv(as.data.frame(resOrdered), file= savingPath)
+write.csv(as.data.frame(res), file= savingPath)
 
 
 
