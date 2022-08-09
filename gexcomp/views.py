@@ -138,38 +138,14 @@ def json_main_chart(request):
 
     imputation_err = np.abs(gex_1 - gex_2)
 
-    #HGNC complete gene set sorted by chr -> arm (p -> q) -> pos
-    # chr-gene
-    df_complete = pd.read_csv(hgnc_complete_set_path, index_col=False)
-    df_complete = df_complete[["chr", "Ensembl gene ID"]]
-    #zip 2 cols as dict. ex ENSG ID -> 3 (chrom. 3)
-    complete_chr_gene = dict(zip(df_complete["Ensembl gene ID"], df_complete["chr"]))
 
-    upload_genes = list(df.columns)
-    upload_chr_gene = {}
-    chrs = []
-    #init and fill with leading zeros. e.g: (01) instead of (1). Thihs is to match .csv file content
-    for i in range(1, 23, 1):
-        chrs.append(str(i).zfill(2))
-    chrs = chrs + ["X", "Y"]
-
-    #init all with 0
-    for chr in chrs:
-        upload_chr_gene[chr] = 0
-
-    #count
-    for gene in upload_genes:
-        if gene in complete_chr_gene:
-            chr = complete_chr_gene[gene]
-            upload_chr_gene[chr] += 1
 
     context = {
         'chart-series': [
             {'name': 'GEX1', 'data': gex_1.tolist()},
             {'name': 'GeX2', 'data': gex_2.tolist()}
         ],
-        'nav-series': imputation_err.tolist(),
-        'chr-gene-count': upload_chr_gene
+        'nav-series': imputation_err.tolist()
     }
 
     return JsonResponse(context)
@@ -277,9 +253,12 @@ def json_win_selected_bio_analysis(request, run_id, win_start, win_end):
 
     # generate top wins html table
     tbl_top_degs = ""
+    # save top DEGs for chr-deg-count chart later
+    degs = []
     iterator = 1
     for index, row in df_dea.iloc[:30].iterrows():
         deg_ensl_id = index
+        degs.append(deg_ensl_id)
         deg_pval = round(row["pvalue"], 4)
         deg_adj_pval = round(row["padj"], 4)
         deg_log2_fc = round(row["log2FoldChange"], 4)
@@ -314,6 +293,36 @@ def json_win_selected_bio_analysis(request, run_id, win_start, win_end):
         tbl_top_degs += "</tr>"
 
         iterator += 1
+
+    # chr-deg count
+    # HGNC complete gene set sorted by chr -> arm (p -> q) -> pos
+
+    df_complete = pd.read_csv(hgnc_complete_set_path, index_col=False)
+    df_complete = df_complete[["chr", "Ensembl gene ID"]]
+    # zip 2 cols as dict. ex ENSG ID -> 3 (chrom. 3)
+    complete_chr_gene = dict(zip(df_complete["Ensembl gene ID"], df_complete["chr"]))
+
+    upload_genes = list(df.columns)
+    dea_chr_gene_cnt = {}
+    chrs = []
+    # init and fill with leading zeros. e.g: (01) instead of (1). Thihs is to match .csv file content
+    for i in range(1, 23, 1):
+        chrs.append(str(i).zfill(2))
+    chrs = chrs + ["X", "Y"]
+
+    # init all with 0
+    for chr in chrs:
+        dea_chr_gene_cnt[chr] = 0
+
+    # count
+    for gene in degs:
+        if gene in complete_chr_gene:
+            chr = complete_chr_gene[gene]
+            dea_chr_gene_cnt[chr] += 1
+
+    dea_chr_gene_cnt_series = []
+    for chr in dea_chr_gene_cnt.keys():
+        dea_chr_gene_cnt_series.append({"Chromosome": chr, "y": dea_chr_gene_cnt[chr]})
 
     go_dict = {
         'bar-chart': {
@@ -350,6 +359,10 @@ def json_win_selected_bio_analysis(request, run_id, win_start, win_end):
         'win-end': win_end,
         'tbl-included-genes': tbl_included_genes,
         'tbl-top-degs': tbl_top_degs,
+        'data-dea-chr-gene-cnt': {
+            'chromosomes': chrs,
+            'series': dea_chr_gene_cnt_series
+        },
         'data-go': go_dict,
         'data-kegg': kegg_dict
         #'std-out': str(stdout)

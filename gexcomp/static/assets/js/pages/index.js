@@ -277,6 +277,50 @@ function createEnrichmentBarChart(containerID, data, regulation) {//regulation c
 
 }
 
+function createColChart(containerID, data) {//regulation can be up or down
+
+    Highcharts.chart(containerID, {
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: ''
+        },
+        subtitle: {
+            text: ''
+        },
+        xAxis: {
+            categories: data["chromosomes"]
+        },
+        yAxis: {
+            title: {
+                text: 'Count of Chr-DEGs in selected window'
+            }
+
+        },
+        plotOptions: {
+            series: {
+                stacking: 'normal'
+            }
+        },
+
+        tooltip: {
+        formatter: function () {
+                return '<b>Chr: ' + this.point.category + '</b><br/>' + this.point.y + ' DEG(s)';
+            }
+        },
+
+        series: [
+            {
+                name: 'Chr-DEGs Count ',
+                colorByPoint: true,
+                data: data['series']
+            }
+        ]
+    });
+
+}
+
 function displayWinOnNavigator(winStart, winEnd) {
 
     //scroll to page top
@@ -352,6 +396,9 @@ function startWinSelectedBioAnalysis() {
 
               let dataTblTopDEGs = data['tbl-top-degs'];
               $('#tbl-top-win-degs > tbody').html(dataTblTopDEGs);
+
+              let dataDEAChrGeneCnt = data['data-dea-chr-gene-cnt'];
+              createColChart('win-chr-degs-counts-colchart', dataDEAChrGeneCnt);
 
               //show win-info sidebar
               $('#win-info').removeClass('d-none');
