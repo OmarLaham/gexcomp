@@ -271,28 +271,12 @@ function createEnrichmentBarChart(containerID, data) {
 
 }
 
-function displayWinInfo(winStart, winEnd) {
+function displayWinOnNavigator(winStart, winEnd) {
 
     //scroll to page top
     $('html,body').animate({ scrollTop: 0 }, 'slow', function () {
         //move navigaor to selected win
         mainChart.xAxis[0].setExtremes(winStart, winEnd);
-
-        //TODO: write real code that also generates heatmap
-        let data = '';
-        //create selected win GO word cloud & barchart
-        let dataGOBarChart = data['data-go']['bar-chart'];
-        createEnrichmentBarChart('win-go-barchart', dataGOBarChart);
-        //createWordCloud('win-go-word-cloud', dataGOWordCloud);
-
-        //create selected win KEGG analysis word cloud & barchart
-        let dataKEGGChartBar = data['data-kegg']['bar-chart'];
-        //let dataKEGGWordCloud = '';
-        createEnrichmentBarChart('win-kegg-barchart', dataKEGGChartBar);
-        //createWordCloud('win-kegg-word-cloud', dataKEGGWordCloud);
-
-        //show win-info div
-        $('#win-info').removeClass("d-none");
     });
 
 
@@ -375,7 +359,7 @@ function startWinSelectedBioAnalysis() {
 
 function startWinLenBioAnalysis() {
     let runID = "1";
-    let n_wins = 10;
+    let n_wins = parseInt($('#txt-n-wins').val());
     let win_len = mainChartWinEnd - mainChartWinStart + 1;
     let win_step = 5;
 

@@ -70,7 +70,8 @@
                                 <span class="fw-bold">Window Length:</span> <span id="win-len">0</span>
                                 <br /><br />
                                 <button id="btn-win-selected-bio-analysis" class="btn btn-secondary">For Selected Window Above</button>&nbsp;
-                                <button id="btn-win-len-bio-analysis" class="btn btn-info">For Selected Window Length (N=10)</button>
+                                <button id="btn-win-len-bio-analysis" class="btn btn-info">For (N) Selected Window Length</button>
+                                N = <input id="txt-n-wins" type="text" class="form-control d-inline" placeholder="N wins" aria-label="N wins" value="10">
                                 {% comment %}
                                 <!-- will be added to version 2.0 -->
                                 <br /><br />
@@ -121,7 +122,7 @@
                                         <th class="border-bottom" scope="col">Mean of pred. error</th>
                                         <th class="border-bottom" scope="col">Start Pos.</th>
                                         <th class="border-bottom" scope="col">End Pos.</th>
-                                        <th class="border-bottom" scope="col">Details</th>
+                                        <th class="border-bottom" scope="col">Operations</th>
                                     </tr>
                                     </thead>
                                     <tbody>
