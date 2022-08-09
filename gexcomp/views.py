@@ -253,6 +253,7 @@ def json_win_selected_bio_analysis(request, run_id, win_start, win_end):
                                 'deg_group_original_vs_prediction_win_{0}_to_{1}.csv'.format(win_start,
                                                                                              win_end))  # .format(1226, 1359))
     if not path.exists(dea_output_path):
+        print(">> Running DEA using DESeq2..")
         subprocess.run(
             ["conda", "run", "-n", "r-env", "Rscript",
              path.join(settings.SCRIPTS_DIR, "win_selected_bio_analysis.R"),
@@ -265,6 +266,7 @@ def json_win_selected_bio_analysis(request, run_id, win_start, win_end):
     # if stderr:
     #     raise Exception("Error " + str(stderr))
 
+    # read df outputed by DESeq2 using R script
     df_dea = pd.read_csv(dea_output_path, index_col=0)
 
     #DEGs
@@ -291,7 +293,7 @@ def json_win_selected_bio_analysis(request, run_id, win_start, win_end):
 
         # Ensemble Gene ID
         tbl_top_degs += "<td class =\"text-gray-500\" scope=\"row\">"
-        tbl_top_degs += deg_ensl_id
+        tbl_top_degs += str(deg_ensl_id)
         tbl_top_degs += "</td>"
 
         # P-val
@@ -313,29 +315,31 @@ def json_win_selected_bio_analysis(request, run_id, win_start, win_end):
 
         iterator += 1
 
-    #TODO: version 2, split into up and down regulated. It's ready and done in R script but just need to split series in visualization or to create 2 charts
-    #e.g.
-    # 'up-regulated': {
-    #     'terms': df_go[df_go["regulation"] == "up"].iloc[0:10]["Term"].values.tolist(),
-    #     'pvals': df_go[df_go["regulation"] == "up"].iloc[0:10]["P-value"].values.tolist()
-    # },
-    # 'down-regulated': {
-    #     'terms': df_go[df_go["regulation"] == "down"].iloc[0:10]["Term"].values.tolist(),
-    #     'pvals': df_go[df_go["regulation"] == "down"].iloc[0:10]["P-value"].values.tolist()
-    # }
     go_dict = {
         'bar-chart': {
-            'database': '',#df_go.iloc[0]["Gene_set"],
-            'terms': [],#df_go.iloc[0:10]["Term"].values.tolist(),
-            'pvals': []#df_go.iloc[0:10]["P-value"].values.tolist()
+            'database': '',  # df_go.iloc[0]["Gene_set"],
+            'up-regulated': {
+                'terms': [],  # df_go[df_go["regulation"] == "up"].iloc[0:10]["Term"].values.tolist(),
+                'pvals': [],  # df_go[df_go["regulation"] == "up"].iloc[0:10]["P-value"].values.tolist()
+            },
+            'down-regulated': {
+                'terms': [],  # df_go[df_go["regulation"] == "down"].iloc[0:10]["Term"].values.tolist(),
+                'pvals': [],  # df_go[df_go["regulation"] == "down"].iloc[0:10]["P-value"].values.tolist()
+            }
         }
     }
 
     kegg_dict = {
         'bar-chart': {
             'database': '',#df_kegg.iloc[0]["Gene_set"],
-            'terms': [],#df_kegg.iloc[0:10]["Term"].values.tolist(),
-            'pvals': []#df_kegg.iloc[0:10]["P-value"].values.tolist()
+            'up-regulated': {
+                'terms': [],#df_kegg[df_kegg["regulation"] == "up"].iloc[0:10]["Term"].values.tolist(),
+                'pvals': [],#df_kegg[df_kegg["regulation"] == "up"].iloc[0:10]["P-value"].values.tolist()
+            },
+            'down-regulated': {
+                'terms': [],#df_kegg[df_kegg["regulation"] == "down"].iloc[0:10]["Term"].values.tolist(),
+                'pvals': [],#df_kegg[df_kegg["regulation"] == "down"].iloc[0:10]["P-value"].values.tolist()
+            }
         }
     }
 

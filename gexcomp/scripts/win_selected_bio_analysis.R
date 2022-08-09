@@ -5,10 +5,6 @@ library('DESeq2');
 #library("BiocParallel")
 #register(MulticoreParam(4))
 
-#install missing libraries
-#chooseCRANmirror(ind=33); #Germany
-
-#BiocManager::install("apeglm")
 
 #commandArgs picks up the variables you pass from the command line
 args <- commandArgs(trailingOnly = TRUE);
@@ -59,8 +55,8 @@ res <- res[order(res$padj),]
 res <- res[res$padj <= 0.05,]
 res <- res[abs(res$log2FoldChange) >= 1.5,]
 #
-res$regulation <- "up"
-res$regulation[res$log2FoldChange < 0] <- "down"
+res["regulation"] <- "up"
+#res[res$log2FoldChange < 0, "regulation"] <- "down"
 
 # export results to continue with Python
 savingPath <- file.path("gexcomp", "media", "runs", runID, paste0("deg_group_original_vs_prediction_win_", winStart, "_to_", winEnd, ".csv"))

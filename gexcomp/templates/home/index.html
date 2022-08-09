@@ -170,15 +170,15 @@
 
     <!-- selected win info -->
     <div id="win-info" class="row d-none">
-        <!-- Top DEGs from selected win -->
         <div class="col-8 col-xl-8">
+            <!-- Top DEGs from selected win -->
             <div class="row">
                 <div class="col-12 col-xl-12">
                     <div class="card border-0 shadow">
                         <div class="card-header">
                             <div class="row align-items-center">
                                 <div class="col">
-                                    <h2 class="fs-5 fw-bold mb-0">TOP 30 DEGs in Selected Win</h2>
+                                    <h2 class="fs-5 fw-bold mb-0">TOP DEGs in Selected Win (max. 30)</h2>
                                 </div>
                             </div>
                         </div>
@@ -202,52 +202,67 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <!-- GO, KEGG, Included Genes table -->
-        <div class="col-4 col-xl-4">
-            <div class="col-12 px-0 mb-4">
-                <div class="card border-0 shadow">
-                    <!-- Top GO Terms -->
-                    <div class="card-header d-flex flex-row align-items-center flex-0 border-bottom">
-                        <div class="d-block">
-                            <div class="h3 fw-normal text-gray mb-2">Selected Win Info.</div>
-                            <div class="h5 fw-normal text-gray mb-2">Top GO Terms</div>
+            <br />
+            <!-- GO for selected win -->
+            <div class="row">
+                <div class="col-12 col-xl-12">
+                    <div class="card border-0 shadow">
+                        <div class="card-header">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h2 class="fs-5 fw-bold mb-0">Selected Win GO Analysis</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="row">
+                                <div class="col-12 col-xl-6 p-4">
+                                    <figure class="highcharts-figure">
+                                        <div id="win-go-up-barchart"></div>
+                                    </figure>
+                                </div>
+                                <div class="col-12 col-xl-6 p-4">
+                                    <figure class="highcharts-figure">
+                                        <div id="win-go-down-barchart"></div>
+                                    </figure>
+                                </div>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="card-body p-2">
-
-                        <figure class="highcharts-figure">
-                            <div id="win-go-barchart"></div>
-                        </figure>
-                        <!--
-                        <br />
-                        <figure class="highcharts-figure">
-                            <div id="win-go-word-cloud"></div>
-                        </figure>
-                        -->
-                    </div>
-
-                    <!-- Top KEGG pathways -->
-                    <div class="card-header d-flex flex-row align-items-center flex-0 border-bottom">
-                        <div class="d-block">
-                            <div class="h5 fw-normal text-gray mb-2">Top KEGG Pathways</div>
-                        </div>
-                    </div>
-                    <div class="card-body p-2">
-                        <figure class="highcharts-figure">
-                            <div id="win-kegg-barchart"></div>
-                        </figure>
-                        <!--
-                        <br />
-                        <figure class="highcharts-figure">
-                            <div id="win-kegg-word-cloud"></div>
-                        </figure>
-                        -->
-                    </div>
-
                 </div>
             </div>
+          <br />
+          <!-- KEGG for selected win -->
+          <div class="row">
+              <div class="col-12 col-xl-12">
+                  <div class="card border-0 shadow">
+                      <div class="card-header">
+                          <div class="row align-items-center">
+                              <div class="col">
+                                  <h2 class="fs-5 fw-bold mb-0">Selected Win KEGG Analysis</h2>
+                              </div>
+                          </div>
+                      </div>
+                      <div>
+                          <div class="row">
+                              <div class="col-12 col-xl-6 p-4">
+                                    <figure class="highcharts-figure">
+                                        <div id="win-kegg-up-barchart"></div>
+                                    </figure>
+                                </div>
+                                <div class="col-12 col-xl-6 p-4">
+                                    <figure class="highcharts-figure">
+                                        <div id="win-kegg-down-barchart"></div>
+                                    </figure>
+                                </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+        </div>
+        <!-- Included Genes table -->
+        <div class="col-4 col-xl-4">
             <!-- Included genes -->
             <div class="card-header d-flex flex-row align-items-center flex-0 border-bottom">
                 <div class="d-block">
