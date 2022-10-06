@@ -93,7 +93,7 @@ class EnrichRAnalysisInputType(Enum):
     geneSymbols = 2
 
 #runs EnrichR GO & KEGG analyis on list of gene symbols and returns 2 DFs, one for each of analysis with cols :(Gene_set, Term, Overlap, P-value, Adjusted P-value, Old P-value, Old Adjusted P-value, Odds Ratio, Combined Score, Genes)
-def util_run_enrichr_analysis(gene_list, enrichr_analysis_input_type):
+def util_run_enrichr_analysis(gene_list, enrichr_analysis_input_type, n_max_terms=10):
 
     #select db from default is human
     gp.get_library_name()
@@ -111,10 +111,66 @@ def util_run_enrichr_analysis(gene_list, enrichr_analysis_input_type):
 
 
     df_res = enr.results
-    df_res_go = df_res[df_res["Gene_set"] == "GO_Biological_Process_2018"]
-    df_res_kegg = df_res[df_res["Gene_set"] == "KEGG_2016"]
+    df_go = df_res[df_res["Gene_set"] == "GO_Biological_Process_2018"]
+    df_kegg = df_res[df_res["Gene_set"] == "KEGG_2016"]
 
-    return df_res_go, df_res_kegg
+    #manipulate return value after checking for empty result or error
+
+    # #debugging
+    # print("df GO")
+    # print(df_go)
+    # print("df_go_cols", df_go.columns)
+    # print("df KEGG")
+    # print(df_kegg)
+    # print("df_kegg_cols", df_kegg.columns)
+
+    # GO
+    try:
+        go_dict = {
+            'bar-chart': {
+                'database': df_go.iloc[0]["Gene_set"],
+                'enriched': {
+                    'terms': df_go.iloc[0:n_max_terms]["Term"].values.tolist(),
+                    'pvals': df_go.iloc[0:n_max_terms]["P-value"].values.tolist()
+                }
+            }
+        }
+
+    except Exception as e:
+        go_dict = {
+            'bar-chart': {
+                'database': 'Empty GO Analysis Result',
+                'enriched': {
+                    'terms': [],
+                    'pvals': [],
+                }
+            }
+        }
+
+    # KEGG
+    try:
+        kegg_dict = {
+            'bar-chart': {
+                'database': df_kegg.iloc[0]["Gene_set"],
+                'enriched': {
+                    'terms': df_kegg.iloc[0:n_max_terms]["Term"].values.tolist(),
+                    'pvals': df_kegg.iloc[0:n_max_terms]["P-value"].values.tolist()
+                }
+            }
+        }
+
+    except Exception as e:
+        kegg_dict = {
+            'bar-chart': {
+                'database': 'Empty KEGG Analysis Result',
+                'enriched': {
+                    'terms': [],
+                    'pvals': [],
+                }
+            }
+        }
+
+    return df_go, df_kegg, go_dict, kegg_dict
 
 #@login_required(login_url="/login/")
 def index(request):
@@ -273,87 +329,29 @@ def json_win_selected_bio_analysis(request, run_id, win_start, win_end):
 
     # GO & KEGG: run EnrichR analysis regardless if this window has been called before or not
     # try except is very important because sometimes the error is from the side of EnrichR servers
+    # errors for empty results are handled inside util_run_enrichr_analysis function
     try:
-        df_go, df_kegg = util_run_enrichr_analysis(degs, EnrichRAnalysisInputType.EnsemblGeneIDs)
+        df_go, df_kegg, go_dict, kegg_dict = util_run_enrichr_analysis(degs, EnrichRAnalysisInputType.EnsemblGeneIDs)
 
-        # #debugging
-        # print("df GO")
-        # print(df_go)
-        # print("df_go_cols", df_go.columns)
-        # print("df KEGG")
-        # print(df_kegg)
-        # print("df_kegg_cols", df_kegg.columns)
-
-        go_dict = {
-            'bar-chart': {
-                'database': df_go.iloc[0]["Gene_set"],
-                'enriched': {
-                    'terms': df_go.iloc[0:10]["Term"].values.tolist(),
-                    'pvals': df_go.iloc[0:10]["P-value"].values.tolist()
-                },
-                # 'up-regulated': {
-                #     'terms': df_go[df_go["regulation"] == "up"].iloc[0:10]["Term"].values.tolist(),
-                #     'pvals': df_go[df_go["regulation"] == "up"].iloc[0:10]["P-value"].values.tolist()
-                # },
-                # 'down-regulated': {
-                #     'terms': df_go[df_go["regulation"] == "down"].iloc[0:10]["Term"].values.tolist(),
-                #     'pvals': df_go[df_go["regulation"] == "down"].iloc[0:10]["P-value"].values.tolist()
-                # }
-            }
-        }
-
-        kegg_dict = {
-            'bar-chart': {
-                'database': df_kegg.iloc[0]["Gene_set"],
-                'enriched': {
-                    'terms': df_kegg.iloc[0:10]["Term"].values.tolist(),
-                    'pvals': df_kegg.iloc[0:10]["P-value"].values.tolist()
-                },
-                # 'up-regulated': {
-                #     'terms': df_kegg[df_kegg["regulation"] == "up"].iloc[0:10]["Term"].values.tolist(),
-                #     'pvals': df_kegg[df_kegg["regulation"] == "up"].iloc[0:10]["P-value"].values.tolist()
-                # },
-                # 'down-regulated': {
-                #     'terms': df_kegg[df_kegg["regulation"] == "down"].iloc[0:10]["Term"].values.tolist(),
-                #     'pvals': df_kegg[df_kegg["regulation"] == "down"].iloc[0:10]["P-value"].values.tolist()
-                # }
-            }
-        }
-    except Exception as e:
+    except Exception as e: #in case all our call to EnrichR fails
         print("EnrichR exception message:", e)
         go_dict = {
             'bar-chart': {
-                'database': 'Barchart test GO DB',
+                'database': 'Error connecting to EnrichR',
                 'enriched': {
-                    'terms': ["(exp. term1)", "(exp. term2)", "(exp. term3)", "(exp. term4)"],
-                    'pvals': [1,1.5,1.2,1.4],
-                },
-                # 'up-regulated': {
-                #     'terms': ["(exp. term1)", "(exp. term2)", "(exp. term3)", "(exp. term4)"],
-                #     'pvals': [1,1.5,1.2,1.4],
-                # },
-                # 'down-regulated': {
-                #     'terms': ["(exp. term1)", "(exp. term2)", "(exp. term3)", "(exp. term4)"],
-                #     'pvals': [1,1.5,1.2,1.4],
-                # }
+                    'terms': [],
+                    'pvals': [],
+                }
             }
         }
 
         kegg_dict = {
             'bar-chart': {
-                'database': 'Barchart test KEGG DB',
+                'database': 'Error connecting to EnrichR',
                 'enriched': {
-                    'terms': ["(exp. term1)", "(exp. term2)", "(exp. term3)", "(exp. term4)"],
-                    'pvals': [1,1.5,1.2,1.4],
-                },
-                # 'up-regulated': {
-                #     'terms': ["(exp. term1)", "(exp. term2)", "(exp. term3)", "(exp. term4)"],
-                #     'pvals': [1,1.5,1.2,1.4],
-                # },
-                # 'down-regulated': {
-                #     'terms': ["(exp. term1)", "(exp. term2)", "(exp. term3)", "(exp. term4)"],
-                #     'pvals': [1,1.5,1.2,1.4],
-                # }
+                    'terms': [],
+                    'pvals': [],
+                }
             }
         }
 
