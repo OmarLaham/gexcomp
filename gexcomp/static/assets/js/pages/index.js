@@ -3,6 +3,7 @@
 var mainChart = null;
 var mainChartWinStart = 0
 var mainChartWinEnd = 100
+var tblDEGsContent = null
 
 function createMainChart(data) {
 
@@ -400,6 +401,8 @@ function startWinSelectedBioAnalysis() {
               $("#tbl-win-included-genes > tbody").html(dataTblIncludedGenes);
 
               let dataTblTopDEGs = data['tbl-top-degs'];
+              //save DEGs csv content exported by server to be ready for table download button
+              tblDEGsContent = data['tbl-top-degs-csv'];
               $('#tbl-top-win-degs > tbody').html(dataTblTopDEGs);
 
               let dataDEAChrGeneCnt = data['data-dea-chr-gene-cnt'];
@@ -449,6 +452,20 @@ function startWinLenBioAnalysis() {
       })
 }
 
+function download(filename, text) {
+
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', filename);
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+    
+}
 
 $(document).ready(function() {
     //creat main-chart
@@ -466,8 +483,6 @@ $(document).ready(function() {
             alert( "Error in fetching main chart data. Please try again later." );
       })
 
-
-
     //bind events
 
     $('#btn-win-selected-bio-analysis').click(function() {
@@ -476,6 +491,10 @@ $(document).ready(function() {
 
     $('#btn-win-len-bio-analysis').click(function() {
         startWinLenBioAnalysis();
+    });
+
+    $('#btn-download-degs').click(function() {
+       download("degs.csv", tblDEGsContent);
     });
 
 

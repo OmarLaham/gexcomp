@@ -1,7 +1,7 @@
 {% extends "layouts/base.html" %}
 {% load static %}
 
-{% block title %} Dashboard {% endblock %}
+{% comment %}{% block title %} Dashboard {% endblock %}{% endcomment %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -47,9 +47,9 @@
                         <div class="fs-5 fw-normal mb-2">Quality Check</div>
                         <h2 class="fs-3 fw-extrabold">Gene Expression Prediction</h2>
                         <div class="small mt-2">
-                            <span class="fw-normal me-2">Comparison: </span>
+                            <span class="fw-normal me-2">Chart Comparison: </span>
                             <span class="fas fa-angle-up text-success"></span>
-                            <span class="text-success fw-bold">Original vs Predicted</span>
+                            <span class="text-success fw-bold">Mean of Group1 vs Mean of Group2</span>
                         </div>
                     </div>
                 </div>
@@ -67,7 +67,7 @@
                         <div class="col-12 col-xl-12 px-xl-0 text-center">
                             <div class="mt-1 text-center">
                                 <h4 class="text-gray-500">Run Biological Analaysis (GO, KEGG)</h4>
-                                <span class="fw-bold">Window Length:</span> <span id="win-len">0</span>
+                                <span class="fw-bold">Window Length:</span> <span id="win-len">Full</span>
                                 <br /><br />
                                 <button id="btn-win-selected-bio-analysis" class="btn btn-secondary">For Selected Window Above</button>&nbsp;
                                 <button id="btn-win-len-bio-analysis" class="btn btn-info">For (N) Selected Window Length</button>
@@ -176,9 +176,14 @@
                 <div class="col-12 col-xl-12">
                     <div class="card border-0 shadow">
                         <div class="card-header">
-                            <div class="row align-items-center">
-                                <div class="col">
+                            <div class="row">
+                                <div class="col-xl-9">
                                     <h2 class="fs-5 fw-bold mb-0">TOP DEGs in Selected Win (max. 30)</h2>
+                                </div>
+                                <div class="col-xl-3">
+                                    <div class="justify-content-end">
+                                      <button type="button" id="btn-download-degs" class="btn-primary">Download as .csv</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -248,6 +248,8 @@ def json_win_selected_bio_analysis(request, run_id, win_start, win_end):
     #DEGs
     degs = list(df_dea.index)
 
+    tbl_top_degs_csv_header = "index,ensemble_id,symbol,pval,adj_pval,log2_fc"
+
     if len(degs) == 0: # if no degs, start further process
         context = {
             'segment': 'win-selected-bio-analysis',
@@ -255,6 +257,7 @@ def json_win_selected_bio_analysis(request, run_id, win_start, win_end):
             'win-start': win_start,
             'win-end': win_end,
             'tbl-included-genes': tbl_included_genes,
+            'tbl-top-degs-csv': tbl_top_degs_csv_header,
             'tbl-top-degs': ["NA", "NA", "NA", "NA", "NA", "NA"],
             'data-dea-chr-gene-cnt': {
                 'chromosomes': [],
@@ -356,6 +359,7 @@ def json_win_selected_bio_analysis(request, run_id, win_start, win_end):
 
     # generate top wins html table
     tbl_top_degs = ""
+    tbl_top_degs_csv = [tbl_top_degs_csv_header] #init with .csv header
     # save top DEGs for chr-deg-count chart later
     degs = []
     iterator = 1
@@ -363,9 +367,14 @@ def json_win_selected_bio_analysis(request, run_id, win_start, win_end):
         deg_ensl_id = index
         deg_symbol = genes_symbols[deg_ensl_id]
         degs.append(deg_ensl_id)
-        deg_pval = round(row["pvalue"], 4)
-        deg_adj_pval = round(row["padj"], 4)
-        deg_log2_fc = round(row["log2FoldChange"], 4)
+        deg_pval = row["pvalue"]
+        deg_adj_pval = row["padj"]
+        deg_log2_fc = row["log2FoldChange"]
+
+        #get also in csv format for download
+        #this is not the best way since downloading is a feature that we can have if we use jquery tables! However, let's keep it simple
+        row_csv = ",".join([str(index), deg_ensl_id, deg_symbol, str(deg_pval), str(deg_adj_pval), str(deg_log2_fc)])
+        tbl_top_degs_csv.append(row_csv)
 
         tbl_top_degs += "<tr>"
 
@@ -402,6 +411,8 @@ def json_win_selected_bio_analysis(request, run_id, win_start, win_end):
         tbl_top_degs += "</tr>"
 
         iterator += 1
+
+    tbl_top_degs_csv = "\n".join(tbl_top_degs_csv)
 
     # chr-deg count
     # HGNC complete gene set sorted by chr -> arm (p -> q) -> pos
@@ -442,6 +453,7 @@ def json_win_selected_bio_analysis(request, run_id, win_start, win_end):
         'win-end': win_end,
         'tbl-included-genes': tbl_included_genes,
         'tbl-top-degs': tbl_top_degs,
+        'tbl-top-degs-csv': tbl_top_degs_csv,
         'data-dea-chr-gene-cnt': {
             'chromosomes': chrs,
             'series': dea_chr_gene_cnt_series
