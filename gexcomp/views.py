@@ -80,9 +80,9 @@ def util_query_genes_symbols(genes_ensg_ids):
     for gene_id in genes_ensg_ids:
         try:
             symbol = df_complete[df_complete["Ensembl gene ID"] == gene_id].iloc[0,0]
-            result.append([gene_id, symbol]) #we want to return only genes with symbols
+            result.append([gene_id, symbol])
         except:
-            pass
+            result.append([gene_id, "NA"])
 
     df_result = pd.DataFrame(result, columns=["Ensemble gene ID", "Approved symbol"])
 
@@ -214,12 +214,14 @@ def json_win_selected_bio_analysis(request, run_id, win_start, win_end):
 
     # HTML for tbl includes ENSG ID and symbol
     tbl_included_genes = ""
-    gene_symbols = list(util_query_genes_symbols(
-        genes).to_numpy())  # note that un-found genes will be removed from the set. result shape: [["Ensembl gene ID", "Approved symbol"], [], ..]
-    for entry in gene_symbols:
+    df_genes_symbols = util_query_genes_symbols(genes) # note that un-found genes will be removed from the df. result shape: [["Ensembl gene ID", "Approved symbol"], [], ..]
+    genes_symbols = dict(zip(df_genes_symbols["Ensemble gene ID"], df_genes_symbols["Approved symbol"]))
+    #gene_symbols = list(util_query_genes_symbols(
+        #genes).to_numpy())
+    for ensemble_gene_id in genes_symbols.keys():
         tbl_included_genes += "<tr>"
-        tbl_included_genes += "<td class=\"text-gray-900\">" + entry[0] + "</td>"
-        tbl_included_genes += "<td class=\"text-gray-500\">" + entry[1] + "</td>"
+        tbl_included_genes += "<td class=\"text-gray-900\">" + ensemble_gene_id + "</td>"
+        tbl_included_genes += "<td class=\"text-gray-500\">" + genes_symbols[ensemble_gene_id] + "</td>"
         tbl_included_genes += "<td class=\"text-gray-500\">" + "0" + "</td>"  # STD .. for later #TODO
         tbl_included_genes += "</tr>"
 
@@ -258,6 +260,7 @@ def json_win_selected_bio_analysis(request, run_id, win_start, win_end):
     iterator = 1
     for index, row in df_dea.iloc[:30].iterrows():
         deg_ensl_id = index
+        deg_symbol = genes_symbols[deg_ensl_id]
         degs.append(deg_ensl_id)
         deg_pval = round(row["pvalue"], 4)
         deg_adj_pval = round(row["padj"], 4)
@@ -273,6 +276,11 @@ def json_win_selected_bio_analysis(request, run_id, win_start, win_end):
         # Ensemble Gene ID
         tbl_top_degs += "<td class =\"text-gray-500\" scope=\"row\">"
         tbl_top_degs += str(deg_ensl_id)
+        tbl_top_degs += "</td>"
+
+        # Ensemble Gene ID
+        tbl_top_degs += "<td class =\"text-gray-500\" scope=\"row\">"
+        tbl_top_degs += str(deg_symbol)
         tbl_top_degs += "</td>"
 
         # P-val
