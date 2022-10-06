@@ -59,7 +59,7 @@ res["regulation"] <- "up"
 #res[res$log2FoldChange < 0, "regulation"] <- "down"
 
 # export results to continue with Python
-savingPath <- file.path("gexcomp", "media", "runs", runID, paste0("deg_group_original_vs_prediction_win_", winStart, "_to_", winEnd, ".csv"))
+savingPath <- file.path("gexcomp", "media", "runs", runID, paste0("deg_group1_vs_group2_win_", winStart, "_to_", winEnd, ".csv"))
 write.csv(as.data.frame(res), file= savingPath)
 
 

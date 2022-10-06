@@ -205,14 +205,14 @@ function createWordCloud(containerID, data) {
     console.log("hi");
 }
 
-function createEnrichmentBarChart(containerID, data, regulation) {//regulation can be up or down
+function createEnrichmentBarChart(containerID, data, regulation="enriched") {//regulation can be up or down
 
-    if (["up-regulated", "down-regulated"].includes(regulation) == false) {
-        alert("Error: wrong regulation type for encrichment bar chart. Must be 'up' or 'down'.")
+    if (["enriched", "up-regulated", "down-regulated"].includes(regulation) == false) {
+        alert("Error: wrong regulation type for encrichment bar chart. Must be 'enriched', 'up' or 'down'.")
         return;
     }
 
-    let TEST_MODE = true;
+    let TEST_MODE = false;
     //categories
     var categories = (TEST_MODE) ? ["(term1)", "(t2)", "(t3)", "(t4)"] : data[regulation]["terms"];
 
@@ -224,7 +224,7 @@ function createEnrichmentBarChart(containerID, data, regulation) {//regulation c
             text: ''
         },
         subtitle: {
-            text: (TEST_MODE) ? 'Barchart some DB' : data["database"]
+            text: data["database"]
         },
         xAxis: [{
             categories: categories,
@@ -259,10 +259,10 @@ function createEnrichmentBarChart(containerID, data, regulation) {//regulation c
 
         series: [
             {
-                name: 'Terms from ' + regulation + ' genes',
-                data: (TEST_MODE) ? [1,1.5,1.2,1.4] : data[regulation]["pvals"],
+                name: 'Terms',
+                data: data[regulation]["pvals"],
                 cursor: 'pointer',
-                color: (regulation == "up-regulated") ? '#F8766D' : '#619CFF',
+                color: (regulation === "enriched" || regulation == "up-regulated") ? '#F8766D' : '#619CFF',
                 point: {
                     events: {
                         click: function () {
@@ -383,15 +383,17 @@ function startWinSelectedBioAnalysis() {
 
               //create selected win GO word cloud & barchart
               let dataGOBarChart = data['data-go']['bar-chart']; //will contain data for up and down regulated
-              createEnrichmentBarChart('win-go-up-barchart', dataGOBarChart, 'up-regulated');
-              createEnrichmentBarChart('win-go-down-barchart', dataGOBarChart, 'down-regulated');
+              createEnrichmentBarChart('win-go-enriched-barchart', dataGOBarChart, 'enriched');
+              //createEnrichmentBarChart('win-go-up-barchart', dataGOBarChart, 'up-regulated');
+              //createEnrichmentBarChart('win-go-down-barchart', dataGOBarChart, 'down-regulated');
               //createWordCloud('win-go-word-cloud', dataGOWordCloud);
 
               //create selected win KEGG analysis word cloud & barchart
               let dataKEGGChartBar = data['data-kegg']['bar-chart']; //will contain data for up and down regulated
               //let dataKEGGWordCloud = '';
-              createEnrichmentBarChart('win-kegg-up-barchart', dataKEGGChartBar, 'up-regulated');
-              createEnrichmentBarChart('win-kegg-down-barchart', dataKEGGChartBar, 'down-regulated');
+              createEnrichmentBarChart('win-kegg-enriched-barchart', dataKEGGChartBar, 'enriched');
+              //createEnrichmentBarChart('win-kegg-up-barchart', dataKEGGChartBar, 'up-regulated');
+              //createEnrichmentBarChart('win-kegg-down-barchart', dataKEGGChartBar, 'down-regulated');
               //createWordCloud('win-kegg-word-cloud', dataKEGGWordCloud);
 
               let dataTblIncludedGenes = data['tbl-included-genes'];

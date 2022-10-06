@@ -101,7 +101,6 @@ def util_run_enrichr_analysis(gene_list, enrichr_analysis_input_type):
     if enrichr_analysis_input_type == EnrichRAnalysisInputType.EnsemblGeneIDs: #convert to gene symbols
         df_query_res = util_query_genes_symbols(gene_list)
         gene_list = df_query_res["Approved symbol"].values.tolist()
-        print("############OOOOOO#############", gene_list)
 
     enr = gp.enrichr(gene_list= gene_list, #expects string input or file
                      gene_sets=['GO_Biological_Process_2018', 'KEGG_2016'],
@@ -222,14 +221,13 @@ def json_win_selected_bio_analysis(request, run_id, win_start, win_end):
         tbl_included_genes += "<tr>"
         tbl_included_genes += "<td class=\"text-gray-900\">" + ensemble_gene_id + "</td>"
         tbl_included_genes += "<td class=\"text-gray-500\">" + genes_symbols[ensemble_gene_id] + "</td>"
-        tbl_included_genes += "<td class=\"text-gray-500\">" + "0" + "</td>"  # STD .. for later #TODO
+        tbl_included_genes += "<td class=\"text-gray-500\">" + "NA" + "</td>"  # STD .. for later #TODO
         tbl_included_genes += "</tr>"
 
 
     # run DEA using DESeq2 (R) only if no result exists for this win (not called before)
     dea_output_path = path.join(settings.RUNS_DIR, run_id,
-                                'deg_group_original_vs_prediction_win_{0}_to_{1}.csv'.format(win_start,
-                                                                                             win_end))  # .format(1226, 1359))
+                                'deg_group1_vs_group2_win_{0}_to_{1}.csv'.format(win_start, win_end))
     if not path.exists(dea_output_path):
         print(">> Running DEA using DESeq2..")
         subprocess.run(
@@ -250,8 +248,111 @@ def json_win_selected_bio_analysis(request, run_id, win_start, win_end):
     #DEGs
     degs = list(df_dea.index)
 
+    if len(degs) == 0: # if no degs, start further process
+        context = {
+            'segment': 'win-selected-bio-analysis',
+            'run-id': run_id,
+            'win-start': win_start,
+            'win-end': win_end,
+            'tbl-included-genes': tbl_included_genes,
+            'tbl-top-degs': ["NA", "NA", "NA", "NA", "NA", "NA"],
+            'data-dea-chr-gene-cnt': {
+                'chromosomes': [],
+                'series': []
+            },
+            'data-go': {},
+            'data-kegg': {}
+            # 'std-out': str(stdout)
+        }
+        return JsonResponse(context)
+
+    #go_dict and kegg_dict will be added to context later
+
     # GO & KEGG: run EnrichR analysis regardless if this window has been called before or not
-    #df_go, df_kegg = util_run_enrichr_analysis(degs, EnrichRAnalysisInputType.EnsemblGeneIDs)
+    # try except is very important because sometimes the error is from the side of EnrichR servers
+    try:
+        df_go, df_kegg = util_run_enrichr_analysis(degs, EnrichRAnalysisInputType.EnsemblGeneIDs)
+
+        # #debugging
+        # print("df GO")
+        # print(df_go)
+        # print("df_go_cols", df_go.columns)
+        # print("df KEGG")
+        # print(df_kegg)
+        # print("df_kegg_cols", df_kegg.columns)
+
+        go_dict = {
+            'bar-chart': {
+                'database': df_go.iloc[0]["Gene_set"],
+                'enriched': {
+                    'terms': df_go.iloc[0:10]["Term"].values.tolist(),
+                    'pvals': df_go.iloc[0:10]["P-value"].values.tolist()
+                },
+                # 'up-regulated': {
+                #     'terms': df_go[df_go["regulation"] == "up"].iloc[0:10]["Term"].values.tolist(),
+                #     'pvals': df_go[df_go["regulation"] == "up"].iloc[0:10]["P-value"].values.tolist()
+                # },
+                # 'down-regulated': {
+                #     'terms': df_go[df_go["regulation"] == "down"].iloc[0:10]["Term"].values.tolist(),
+                #     'pvals': df_go[df_go["regulation"] == "down"].iloc[0:10]["P-value"].values.tolist()
+                # }
+            }
+        }
+
+        kegg_dict = {
+            'bar-chart': {
+                'database': df_kegg.iloc[0]["Gene_set"],
+                'enriched': {
+                    'terms': df_kegg.iloc[0:10]["Term"].values.tolist(),
+                    'pvals': df_kegg.iloc[0:10]["P-value"].values.tolist()
+                },
+                # 'up-regulated': {
+                #     'terms': df_kegg[df_kegg["regulation"] == "up"].iloc[0:10]["Term"].values.tolist(),
+                #     'pvals': df_kegg[df_kegg["regulation"] == "up"].iloc[0:10]["P-value"].values.tolist()
+                # },
+                # 'down-regulated': {
+                #     'terms': df_kegg[df_kegg["regulation"] == "down"].iloc[0:10]["Term"].values.tolist(),
+                #     'pvals': df_kegg[df_kegg["regulation"] == "down"].iloc[0:10]["P-value"].values.tolist()
+                # }
+            }
+        }
+    except Exception as e:
+        print("EnrichR exception message:", e)
+        go_dict = {
+            'bar-chart': {
+                'database': 'Barchart test GO DB',
+                'enriched': {
+                    'terms': ["(exp. term1)", "(exp. term2)", "(exp. term3)", "(exp. term4)"],
+                    'pvals': [1,1.5,1.2,1.4],
+                },
+                # 'up-regulated': {
+                #     'terms': ["(exp. term1)", "(exp. term2)", "(exp. term3)", "(exp. term4)"],
+                #     'pvals': [1,1.5,1.2,1.4],
+                # },
+                # 'down-regulated': {
+                #     'terms': ["(exp. term1)", "(exp. term2)", "(exp. term3)", "(exp. term4)"],
+                #     'pvals': [1,1.5,1.2,1.4],
+                # }
+            }
+        }
+
+        kegg_dict = {
+            'bar-chart': {
+                'database': 'Barchart test KEGG DB',
+                'enriched': {
+                    'terms': ["(exp. term1)", "(exp. term2)", "(exp. term3)", "(exp. term4)"],
+                    'pvals': [1,1.5,1.2,1.4],
+                },
+                # 'up-regulated': {
+                #     'terms': ["(exp. term1)", "(exp. term2)", "(exp. term3)", "(exp. term4)"],
+                #     'pvals': [1,1.5,1.2,1.4],
+                # },
+                # 'down-regulated': {
+                #     'terms': ["(exp. term1)", "(exp. term2)", "(exp. term3)", "(exp. term4)"],
+                #     'pvals': [1,1.5,1.2,1.4],
+                # }
+            }
+        }
 
     # generate top wins html table
     tbl_top_degs = ""
@@ -332,33 +433,7 @@ def json_win_selected_bio_analysis(request, run_id, win_start, win_end):
     for chr in dea_chr_gene_cnt.keys():
         dea_chr_gene_cnt_series.append({"Chromosome": chr, "y": dea_chr_gene_cnt[chr]})
 
-    go_dict = {
-        'bar-chart': {
-            'database': '',  # df_go.iloc[0]["Gene_set"],
-            'up-regulated': {
-                'terms': [],  # df_go[df_go["regulation"] == "up"].iloc[0:10]["Term"].values.tolist(),
-                'pvals': [],  # df_go[df_go["regulation"] == "up"].iloc[0:10]["P-value"].values.tolist()
-            },
-            'down-regulated': {
-                'terms': [],  # df_go[df_go["regulation"] == "down"].iloc[0:10]["Term"].values.tolist(),
-                'pvals': [],  # df_go[df_go["regulation"] == "down"].iloc[0:10]["P-value"].values.tolist()
-            }
-        }
-    }
 
-    kegg_dict = {
-        'bar-chart': {
-            'database': '',#df_kegg.iloc[0]["Gene_set"],
-            'up-regulated': {
-                'terms': [],#df_kegg[df_kegg["regulation"] == "up"].iloc[0:10]["Term"].values.tolist(),
-                'pvals': [],#df_kegg[df_kegg["regulation"] == "up"].iloc[0:10]["P-value"].values.tolist()
-            },
-            'down-regulated': {
-                'terms': [],#df_kegg[df_kegg["regulation"] == "down"].iloc[0:10]["Term"].values.tolist(),
-                'pvals': [],#df_kegg[df_kegg["regulation"] == "down"].iloc[0:10]["P-value"].values.tolist()
-            }
-        }
-    }
 
     context = {
         'segment': 'win-selected-bio-analysis',
@@ -375,6 +450,8 @@ def json_win_selected_bio_analysis(request, run_id, win_start, win_end):
         'data-kegg': kegg_dict
         #'std-out': str(stdout)
     }
+
+    print("> Done: win-selected-bio-analysis")
 
     return JsonResponse(context)
 
