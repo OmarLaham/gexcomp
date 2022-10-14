@@ -10,8 +10,9 @@ from gexcomp import views
 
 
 urlpatterns = [
-    path("", views.index, name='home'), #TemplateView.as_view(template_name="pages/home.html"), name="home"),
-    path("json_main_chart", views.json_main_chart, name='json_main_chart'),
+    path("", views.index, name='home'),
+    path("run/<str:run_id>", views.run, name='run'),
+    path("json_main_chart/<str:run_id>", views.json_main_chart, name='json_main_chart'),
     path("json_win_heatmap/<str:run_id>/<int:win_start>/<int:win_end>", views.json_win_heatmap, name='json_window_heatmap'),
     path("json_win_selected_bio_analysis/<str:run_id>/<int:win_start>/<int:win_end>", views.json_win_selected_bio_analysis, name='json_win_selected_bio_analysis'),
     path("json_win_len_bio_analysis/<str:run_id>/<int:n_wins>/<int:win_len>/<int:win_step>", views.json_win_len_bio_analysis, name='json_win_len_bio_analysis'),

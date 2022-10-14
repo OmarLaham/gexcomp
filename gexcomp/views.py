@@ -172,11 +172,21 @@ def util_run_enrichr_analysis(gene_list, enrichr_analysis_input_type, n_max_term
 
     return df_go, df_kegg, go_dict, kegg_dict
 
-#@login_required(login_url="/login/")
 def index(request):
     context = {'segment': 'index'}
 
     html_template = loader.get_template('home/index.html')
+    return HttpResponse(html_template.render(context, request))
+
+#@login_required(login_url="/login/")
+
+def run(request, run_id):
+    context = {
+        'segment': 'run',
+        'run_id': run_id
+    }
+
+    html_template = loader.get_template('home/run.html')
     return HttpResponse(html_template.render(context, request))
 
 def json_main_chart(request):
