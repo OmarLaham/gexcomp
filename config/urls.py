@@ -11,6 +11,7 @@ from gexcomp import views
 
 urlpatterns = [
     path("", views.index, name='home'),
+    path("index_upload", views.index_upload, name='index_upload'),
     path("run/<str:run_id>", views.run, name='run'),
     path("json_main_chart/<str:run_id>", views.json_main_chart, name='json_main_chart'),
     path("json_win_heatmap/<str:run_id>/<int:win_start>/<int:win_end>", views.json_win_heatmap, name='json_window_heatmap'),

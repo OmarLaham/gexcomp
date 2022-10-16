@@ -85,7 +85,7 @@
           </div>
 
           <br />
-          - <b>Averaged Gene expression file (.csv):</b> - <span class="text-secondary" style="font-weight: bold">Only two rows (plus header)</span><br />
+          - <b>Aggregated by Average Gene expression file (.csv):</b> - <span class="text-secondary" style="font-weight: bold">Only two rows (plus header)</span><br />
 
           <div class="text-center">
             <table class="table table-striped" style="width: 60%; margin-left: auto; margin-right: auto;">
@@ -156,24 +156,24 @@
     <hr />
     <div class="py-4">
       <h4 class="p-2">Upload area:</h4>
-      <div style="max-width: 400px;">
+      <span class="text-danger" style="font-weight: bold">Important: </span>If you upload wrong files you will be redirected to this form.
+      <div style="max-width: 400px; margin-top: 7px;">
+        <form action="{% url 'index_upload'%}" method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="input-data-file" class="form-label"><b>Gene Expression</b> file: (.csv)</label>
+            <input id="input-data-file" name="input-data-file" class="form-control" type="file">
+          </div>
+          <div class="mb-3">
+            <label for="input-data-aggregated-file" class="form-label"><b>Aggregated Gene Expression</b> file: (.csv)</label>
+            <input id="input-data-aggregated-file" name="input-data-agg-file" class="form-control" type="file">
+          </div>
+          <div class="mb-3">
+            <label for="input-data-annotation-file" class="form-label"><b>Date Annotation</b> file: (.csv)</label>
+            <input id="input-data-annotation-file" name="input-data-annotation-file" class="form-control" type="file">
+          </div>
 
-        <div class="mb-3">
-          <label for="formFile" class="form-label"><b>Gene Expression</b> file:</label>
-          <input id="input-data-file" class="form-control" type="file" id="formFile">
-        </div>
-
-        <div class="mb-3">
-          <label for="formFile" class="form-label"><b>Averaged Gene Expression</b> file:</label>
-          <input id="input-data-aggregate-file" class="form-control" type="file" id="formFile">
-        </div>
-        <div class="mb-3">
-          <label for="formFile" class="form-label"><b>Date Annotation</b> file:</label>
-          <input id="input-data-annotation-file" class="form-control" type="file" id="formFile">
-        </div>
-
-        <br />
-        <form action="/run/1">
+          <br />
           <button type="submit" class="btn btn-primary">Upload and Start</button>
         </form>
       </div>

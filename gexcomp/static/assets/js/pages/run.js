@@ -467,7 +467,8 @@ function download(filename, text) {
 
 $(document).ready(function() {
 
-    runID = $('#run-id').text();
+    const window_url_chunks = window.location.href.split("/")
+    runID = window_url_chunks[window_url_chunks.length - 1]
 
     //creat main-chart
     json_main_chart_url = "/json_main_chart/" + runID;

@@ -10,10 +10,13 @@ from django.template import loader
 from django.urls import reverse
 import config.settings.base as settings
 
+from django.core.files.base import ContentFile #for file upload
+
 import pandas as pd
 import numpy as np
 import random
 
+import os
 from os import path
 #to run bash scripts
 import subprocess
@@ -21,6 +24,8 @@ from subprocess import Popen, PIPE
 
 #EnrichR wrapper
 import gseapy as gp
+
+import string # to genrate random run_id
 
 from enum import Enum
 class SortGenesResult(Enum):
@@ -178,20 +183,64 @@ def index(request):
     html_template = loader.get_template('home/index.html')
     return HttpResponse(html_template.render(context, request))
 
+
+def index_upload(request):
+    if request.method != 'POST':
+        return HttpResponseRedirect("/")
+
+
+    run_id_length = 6
+    while True:
+        new_run_id = "run_" + ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(run_id_length))
+        new_run_dir_path = path.join(settings.RUNS_DIR, new_run_id)
+        if not path.exists(new_run_dir_path):
+           break
+
+    os.makedirs(new_run_dir_path);
+
+    try:
+        data_file_filename = request.FILES['input-data-file']
+        data_aggregated_file_filename = request.FILES['input-data-agg-file']
+        data_annotation_file_filename = request.FILES['input-data-annotation-file']
+    except:
+        return HttpResponseRedirect("/")
+
+    files = [
+        data_file_filename,
+        data_aggregated_file_filename,
+        data_annotation_file_filename
+    ]
+
+    for file in files:
+
+        saving_filename = os.path.join(settings.RUNS_DIR, new_run_id, file.name)
+        fout = open(saving_filename, 'wb+') #wb+ because chunks
+
+        uploaded_file_content = ContentFile(file.read())
+
+        try:
+            # Iterate through the chunks.
+            for chunk in uploaded_file_content.chunks():
+                fout.write(chunk)
+            fout.close()
+        except:
+            print("Internal Error: Error while uploading files.")
+            return HttpResponseRedirect("/")
+
+    return HttpResponseRedirect('/run/' + new_run_id)
+
+
 #@login_required(login_url="/login/")
 
 def run(request, run_id):
     context = {
-        'segment': 'run',
-        'run_id': run_id
+        'segment': 'run'
     }
 
     html_template = loader.get_template('home/run.html')
     return HttpResponse(html_template.render(context, request))
 
-def json_main_chart(request):
-
-    run_id = "1"
+def json_main_chart(request, run_id):
 
     n_genes = 4000#3000
 
