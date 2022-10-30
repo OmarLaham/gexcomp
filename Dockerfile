@@ -45,11 +45,11 @@ RUN conda env create -f /requirements/r-env.yml &&\
 
 COPY ./compose/production/django/entrypoint /entrypoint
 #RUN sed -i 's/\r$//g' /entrypoint
-#RUN chmod +x /entrypoint
+RUN chmod +x /entrypoint
 
-#COPY ./compose/local/django/start /start
+COPY ./compose/local/django/start /start
 #RUN sed -i 's/\r$//g' /start
-#RUN chmod +x /start
+RUN chmod +x /start
 
 WORKDIR /app
 
