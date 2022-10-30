@@ -40,15 +40,15 @@ RUN conda env update -n root -f /requirements/merged.yml &&\
     conda clean --all --yes
 
 #create separate R env to avoid conflicts
-RUN conda env create -f /requirements/r-env.yml &&\
-    conda clean --all --yes
+#RUN conda env create -f /requirements/r-env.yml &&\
+#    conda clean --all --yes
 
 COPY ./compose/production/django/entrypoint /entrypoint
-#RUN sed -i 's/\r$//g' /entrypoint
+RUN sed -i 's/\r$//g' /entrypoint
 RUN chmod +x /entrypoint
 
 COPY ./compose/local/django/start /start
-#RUN sed -i 's/\r$//g' /start
+RUN sed -i 's/\r$//g' /start
 RUN chmod +x /start
 
 WORKDIR /app
