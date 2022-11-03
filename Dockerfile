@@ -43,9 +43,9 @@ RUN conda env update -n root -f /requirements/merged.yml &&\
 #RUN conda env create -f /requirements/r-env.yml &&\
 #    conda clean --all --yes
 
-COPY ./compose/production/django/entrypoint /entrypoint
-RUN sed -i 's/\r$//g' /entrypoint
-RUN chmod +x /entrypoint
+#COPY ./compose/production/django/entrypoint /entrypoint
+#RUN sed -i 's/\r$//g' /entrypoint
+#RUN chmod +x /entrypoint
 
 COPY ./compose/local/django/start /start
 RUN sed -i 's/\r$//g' /start
